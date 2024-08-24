@@ -86,14 +86,15 @@ def information_gain(Y: pd.Series, attr: pd.Series, criterion: str):
 
     if check_ifreal(attr)==False:
         #discrete input    => both cases 
-        if criterion == "info_gain":
-            fn = entropy
+        
         
         if criterion == "gini_index":
             fn = gini_index
         
         if criterion =="mse":
             fn = mse
+        else:
+            fn = entropy
 
         info_gain = fn(Y)
         reduction=0.0
@@ -115,7 +116,7 @@ def information_gain(Y: pd.Series, attr: pd.Series, criterion: str):
         attr_sorted = attr.loc[sorted_indices]
         Y_sorted = Y.loc[sorted_indices]
 
-        if criterion == "info_gain":
+        if criterion == "information_gain":
             fn = entropy
         
         if criterion == "gini_index":
@@ -140,7 +141,7 @@ def information_gain(Y: pd.Series, attr: pd.Series, criterion: str):
 
             attr_sorted=(attr_sorted[:-1] + attr_sorted[1:]) / 2 #(taking midpoints for split)
 
-            return pd.DataFrame({"Split values":attr_sorted,"Info Gain":info_gain})
+            return pd.DataFrame({"Split values":attr_sorted,"information_gain":info_gain})
         
         #Real input, Real output 
         else:
@@ -164,7 +165,7 @@ def opt_split_attribute_discrete_input(X: pd.DataFrame, y: pd.Series, criterion,
 
     features: pd.Series is a list of all the attributes we have to split upon
 
-    all: if false, by default, returns attribute to make split on, if true, gives a df with info gain of all attributes
+    all: if false, by default, returns attribute to make split on, if true, gives a df with information_gain of all attributes
 
     return: attribute to split upon
     """
@@ -203,9 +204,9 @@ def opt_split_attribute_real_input(X: pd.DataFrame, y: pd.Series, features: pd.S
             feature = features[i]
             df = pd.DataFrame({"Label": y, "Attribute":X[feature]})
 
-            df_returned =information_gain(df["Label"],df["Attribute"], "info_gain") #what i recieved pd.DataFrame({"Features":features,"Information Gain":info_gain_arr}).sort_values(by="Information Gain")
+            df_returned =information_gain(df["Label"],df["Attribute"], "") #what i recieved pd.DataFrame({"Features":features,"Information Gain":info_gain_arr}).sort_values(by="Information Gain")
 
-            df_returned = df_returned.sort_values(by="Info Gain", ascending=False) 
+            df_returned = df_returned.sort_values(by="information_gain", ascending=False) 
             df_returned.reset_index(drop=True, inplace=True)
 
             df_final.iloc[i,0]=feature
