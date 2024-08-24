@@ -35,7 +35,34 @@ class DecisionTree:
         # Use the functions from utils.py to find the optimal attribute to split upon and then construct the tree accordingly.
         # You may(according to your implemetation) need to call functions recursively to construct the tree. 
 
-        pass
+        #self notes 
+        #the df I recieve, regardless of column, if real input, all columns real, if discrete output, all columns discrete 
+
+        if check_ifreal(X[0])==True:
+            #real input 
+
+            fn = opt_split_attribute_real_input #function for real input split 
+
+            if check_ifreal(y)==True:
+                #Real input, Real output
+                df_feature_importance_and_split_point = fn(X, y, X.columns) 
+            else:
+                #Real input, Discrete output 
+                df_feature_importance_and_split_point = fn(X, y, X.columns) 
+        else:
+            #discrete input 
+            fn = opt_split_attribute_discrete_input #function for discrete input split 
+            #def opt_split_attribute_discrete_input(X: pd.DataFrame, y: pd.Series, criterion, features: pd.Series):
+
+            if check_ifreal(y)==True:
+                #discrte ip, real op 
+                features_importance = fn(X,y,self.criterion,X.columns)
+            else:
+                #discrete ip, discrete op 
+                features_importance = fn(X,y,self.criterion,X.columns)
+
+
+
 
     def predict(self, X: pd.DataFrame) -> pd.Series:
         """
