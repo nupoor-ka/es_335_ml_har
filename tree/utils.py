@@ -16,14 +16,27 @@ def one_hot_encoding(X: pd.DataFrame, columns = None) -> pd.DataFrame:
 
 
 
-def check_ifreal(y: pd.Series) -> bool:
+def check_type(X: pd.DataFrame, y: pd.Series) -> str:
     """
     Function to check if the given series has real or discrete values
     """
 
     #inuitive approach, underoot of length < unique => real
+    input_ = ""
+    output_=""
 
-    return np.sqrt(y.size) <= y.unique().size 
+    if np.sqrt(y.size) < y.unique().size:
+        input_ = "r"
+    else:
+        input_ = "d"
+
+    if np.sqrt(X[0].size) < X[0].unique().size:
+        output_ = "r"
+    else:
+        output_ = "d"
+    
+    return input_+output_
+
 
 
 def entropy(Y: pd.Series) -> float:
@@ -74,7 +87,7 @@ def squared_error(Y: pd.Series)-> float:
     mean_y = np.mean(Y)
     return np.sum((mean_y -Y)**2)
 
-def information_gain(Y: pd.Series, attr: pd.Series, criterion: str):
+def information_gain(Y: pd.Series, attr: pd.Series, criterion: str, case_: str):
     """
     Function to calculate the information gain using criterion (entropy, gini index or MSE)
     
@@ -84,7 +97,9 @@ def information_gain(Y: pd.Series, attr: pd.Series, criterion: str):
     """
     #FIX FOR REAL INPUT OR attr.dtype = float
 
-    if check_ifreal(attr)==False:
+    
+
+    if case_[0]=="d":
         #discrete input    => both cases 
         
         
@@ -127,7 +142,7 @@ def information_gain(Y: pd.Series, attr: pd.Series, criterion: str):
         
         #Real input, Discrete output (Entropy and Gini are relevant here)
 
-        if check_ifreal(Y)==False:
+        if case_[1]=="d":
             #potential split number is one less than number of rows 
             info_gain = np.array([fn(Y_sorted)]*(Y.size-1))
 
@@ -157,15 +172,13 @@ def information_gain(Y: pd.Series, attr: pd.Series, criterion: str):
 
 
 
-def opt_split_attribute_discrete_input(X: pd.DataFrame, y: pd.Series, criterion, features: pd.Series):
+def opt_split_attribute_discrete_input(X: pd.DataFrame, y: pd.Series, criterion, features: pd.Series, case_:str):
     """
     Function to find the optimal attribute to split about.
     If needed you can split this function into 2, one for discrete and one for real valued features.
     You can also change the parameters of this function according to your implementation.
 
     features: pd.Series is a list of all the attributes we have to split upon
-
-    all: if false, by default, returns attribute to make split on, if true, gives a df with information_gain of all attributes
 
     return: attribute to split upon
     """
@@ -178,14 +191,14 @@ def opt_split_attribute_discrete_input(X: pd.DataFrame, y: pd.Series, criterion,
     info_gain_arr = np.zeros(number_of_attributes)
 
     for i in range(number_of_attributes):
-        info_gain_arr[i]=information_gain(y, X[features[i]], criterion)
+        info_gain_arr[i]=information_gain(y, X[features[i]], criterion,case_)
 
     index_max = np.argmax(info_gain_arr)
 
     return features[index_max]
     
 
-def opt_split_attribute_real_input(X: pd.DataFrame, y: pd.Series, features: pd.Series):
+def opt_split_attribute_real_input(X: pd.DataFrame, y: pd.Series, features: pd.Series, case_:str):
     """
     Function to find the optimal attribute to split about.
     This function works for all the cases with real input.
@@ -197,14 +210,15 @@ def opt_split_attribute_real_input(X: pd.DataFrame, y: pd.Series, features: pd.S
 
     number_of_attributes = features.size 
 
-    if check_ifreal(y)==False:
+    if case_[1]=="d":
+        #real input, discrete output 
         df_final = pd.DataFrame(columns=["attribute","split_point","sel_or_infogain"])
 
         for i in range(number_of_attributes):
             feature = features[i]
             df = pd.DataFrame({"Label": y, "Attribute":X[feature]})
 
-            df_returned =information_gain(df["Label"],df["Attribute"], "") #what i recieved pd.DataFrame({"Features":features,"Information Gain":info_gain_arr}).sort_values(by="Information Gain")
+            df_returned =information_gain(df["Label"],df["Attribute"], "", case_) #what i recieved pd.DataFrame({"Features":features,"Information Gain":info_gain_arr}).sort_values(by="Information Gain")
 
             df_returned = df_returned.sort_values(by="information_gain", ascending=False) 
             df_returned.reset_index(drop=True, inplace=True)
@@ -222,7 +236,7 @@ def opt_split_attribute_real_input(X: pd.DataFrame, y: pd.Series, features: pd.S
             feature = features[i]
             df = pd.DataFrame({"Label": y, "Attribute":X[feature]})
 
-            df_returned =information_gain(df["Label"],df["Attribute"], "squared_error") #what i recieved pd.DataFrame({"Split Values":attr_sorted,"loss":loss_across})
+            df_returned =information_gain(df["Label"],df["Attribute"], "squared_error",case_) #what i recieved pd.DataFrame({"Split Values":attr_sorted,"loss":loss_across})
 
 
             df_returned = df_returned.sort_values(by="loss", ascending=True) #the most minimum loss is what is best
