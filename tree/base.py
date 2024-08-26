@@ -42,14 +42,18 @@ class DecisionTree:
         #self notes 
         #the df I recieve, regardless of column, if real input, all columns real, if discrete output, all columns discrete 
         
+        print(self.current_depth) #####
+
         if self.current_depth == self.max_depth:
             return None
 
         if self.current_depth==0:
             self.type = check_type(X, y)
+            print(self.type)  #######
 
             if self.type[0]=="d":
                 X = one_hot_encoding(X, columns = X.columns)
+
                 
         if self.type[1] == 'd':
             if len(y.unique())==1:
@@ -68,15 +72,15 @@ class DecisionTree:
 
             if self.type[1]=="r":
                 #Real input, Real output
-                df_feature_importance_and_split_point = fnn(X, y, X.columns) 
-                df_feature_importance_and_split_point = fnn(X, y, X.columns) #pd.DataFrame["attribute","split_point","sel_or_infogain"])
+                df_feature_importance_and_split_point = fnn(X, y, X.columns, self.type) #pd.DataFrame["attribute","split_point","sel_or_infogain"])
                 (X_left, y_left), (X_right, y_right) =split_data(X, y, df_feature_importance_and_split_point["attribute"][0], df_feature_importance_and_split_point["split_point"][0])
             else:
                 #Real input, Discrete output 
-                df_feature_importance_and_split_point = fnn(X, y, X.columns) #pd.DataFrame["attribute","split_point","sel_or_infogain"])
+                df_feature_importance_and_split_point = fnn(X, y, X.columns, self.type) #pd.DataFrame["attribute","split_point","sel_or_infogain"])
                 (X_left, y_left), (X_right, y_right) =split_data(X, y, df_feature_importance_and_split_point["attribute"][0], df_feature_importance_and_split_point["split_point"][0])
             
             self.current_depth+=1
+            print(self.tree) ##########
             self.tree[branch_label] = {'attribute':df_feature_importance_and_split_point["attribute"][0], 'split_value':df_feature_importance_and_split_point["split_point"][0], 'right_label':str(branch_label+'1_'), 'left_label':str(branch_label+'2_')}
             self.fit(self, X_left, y_left, branch_label = str(branch_label+'2_'))
             self.fit(self, X_right, y_right, branch_label = str(branch_label+'1_'))
