@@ -108,7 +108,7 @@ def information_gain(Y: pd.Series, attr: pd.Series, criterion: str, case_: str):
         
         if criterion =="mse":
             fn = mse
-        else:
+        if criterion == "entropy":
             fn = entropy
 
         info_gain = fn(Y)
@@ -131,7 +131,7 @@ def information_gain(Y: pd.Series, attr: pd.Series, criterion: str, case_: str):
         attr_sorted = attr.loc[sorted_indices]
         Y_sorted = Y.loc[sorted_indices]
 
-        if criterion == "information_gain":
+        if criterion == "entropy":
             fn = entropy
         
         if criterion == "gini_index":
@@ -141,16 +141,17 @@ def information_gain(Y: pd.Series, attr: pd.Series, criterion: str, case_: str):
             fn = squared_error
         
         #Real input, Discrete output (Entropy and Gini are relevant here)
+        info_gain = np.array([fn(Y_sorted)]*(Y.size-1))
 
         if case_[1]=="d":
             #potential split number is one less than number of rows 
-            info_gain = np.array([fn(Y_sorted)]*(Y.size-1))
+            
 
             for i in range(info_gain.shape[0]):
-                lhs_entropy = fn(Y_sorted[:i+1]) #could be gini as well
-                rhs_entropy = fn(Y_sorted[i+1:])
+                lhs_entropy = fn(Y_sorted[:i]) #could be gini as well
+                rhs_entropy = fn(Y_sorted[i:])
 
-                weighted_entropy = (Y_sorted[:i+1].size/Y_sorted.size)*lhs_entropy + (Y_sorted[i+1:].size/Y_sorted.size)*rhs_entropy
+                weighted_entropy = (Y_sorted[:i].size/Y_sorted.size)*lhs_entropy + (Y_sorted[i:].size/Y_sorted.size)*rhs_entropy
 
                 info_gain[i] -= weighted_entropy
 
@@ -161,10 +162,10 @@ def information_gain(Y: pd.Series, attr: pd.Series, criterion: str, case_: str):
         #Real input, Real output 
         else:
             loss_across = np.zeros(Y.size-1)
-
+            
             for i in range(info_gain.shape[0]):
-                lhs_se = fn(Y_sorted[:i+1]) #squared error is the function used 
-                rhs_se = fn(Y_sorted[i+1:])
+                lhs_se = fn(Y_sorted[:i]) #squared error is the function used 
+                rhs_se = fn(Y_sorted[i:])
 
                 loss_across[i] = lhs_se + rhs_se #we will pick the min loss to split 
 
@@ -198,7 +199,7 @@ def opt_split_attribute_discrete_input(X: pd.DataFrame, y: pd.Series, criterion,
     return features[index_max]
     
 
-def opt_split_attribute_real_input(X: pd.DataFrame, y: pd.Series, features: pd.Series, case_:str):
+def opt_split_attribute_real_input(X: pd.DataFrame, y: pd.Series, features: pd.Series, criterion, case_:str):
     """
     Function to find the optimal attribute to split about.
     This function works for all the cases with real input.
@@ -218,7 +219,7 @@ def opt_split_attribute_real_input(X: pd.DataFrame, y: pd.Series, features: pd.S
             feature = features[i]
             df = pd.DataFrame({"Label": y, "Attribute":X[feature]})
 
-            df_returned =information_gain(df["Label"],df["Attribute"], "", case_) #what i recieved pd.DataFrame({"Features":features,"Information Gain":info_gain_arr}).sort_values(by="Information Gain")
+            df_returned =information_gain(df["Label"],df["Attribute"], criterion , case_) #what i recieved pd.DataFrame({"Features":features,"Information Gain":info_gain_arr}).sort_values(by="Information Gain")
 
             df_returned = df_returned.sort_values(by="information_gain", ascending=False) 
             df_returned.reset_index(drop=True, inplace=True)
