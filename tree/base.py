@@ -20,7 +20,7 @@ np.random.seed(42)
 
 @dataclass
 class DecisionTree:
-    criterion: Literal["entropy", "gini_index","squared_loss"]  # criterion won't be used for regression
+    criterion: Literal["entropy", "gini_index","squared_loss","mse"]  # criterion won't be used for regression
     max_depth: int  # The maximum depth the tree can grow to
 
     def __init__(self, criterion, max_depth=5):
@@ -49,14 +49,23 @@ class DecisionTree:
         
 
         if self.current_depth == self.max_depth:
+            if self.type[1]=="d":
+                values, counts = np.unique(y, return_counts=True)
+                most_occurring = values[np.argmax(counts)]
+
+                self.tree[branch_label]=most_occurring
+
+            else:
+                self.tree[branch_label] = np.mean(y)
             return 
 
         if self.current_depth==0:
             self.type = check_type(X, y)
-            print(self.type)  #######
+            # print(self.type)  #######
 
             if self.type[0]=="d":
                 X = one_hot_encoding(X, columns = X.columns)
+                # print(X)
 
                 
         if self.type[1] == 'd':
@@ -77,7 +86,7 @@ class DecisionTree:
             if self.type[1]=="r":
                 #Real input, Real output
                 df_feature_importance_and_split_point = fnn(X, y, X.columns, self.criterion, self.type) #pd.DataFrame["attribute","split_point","sel_or_infogain"])
-                print(df_feature_importance_and_split_point)
+                # print(df_feature_importance_and_split_point)
                 (X_left, y_left), (X_right, y_right) =split_data(X, y, df_feature_importance_and_split_point["attribute"][0], df_feature_importance_and_split_point["split_point"][0],self.type)
             else:
                 #Real input, Discrete output 
@@ -101,16 +110,16 @@ class DecisionTree:
             #discrete input 
             fnn = opt_split_attribute_discrete_input #function for discrete input split 
             #def opt_split_attribute_discrete_input(X: pd.DataFrame, y: pd.Series, criterion, features: pd.Series):
-
-            if self.type[1]=="r":
-                #discrte ip, real op 
-                features_importance = fnn(X,y,self.criterion,X.columns, self.type)
-            else:
-                #discrete ip, discrete op 
-
-                features_importance = fnn(X,y,self.criterion,X.columns,self.type)
-                
-                #split_data(X: pd.DataFrame, y: pd.Series, attribute, value) # return (X_left, y_left), (X_right, y_right)
+            
+            features_importance = fnn(X,y,self.criterion,X.columns,self.type)
+            (X_left, y_left), (X_right, y_right) =split_data(X, y, features_importance, None,self.type)
+            self.current_depth+=1
+            branch_label_r = branch_label+'2_'
+            branch_label_l = branch_label+'1_'
+            self.tree[branch_label] = {'attribute':features_importance, 'right_label':branch_label_r, 'left_label':branch_label_l}
+            self.fit(X_left, y_left, branch_label = branch_label_l)
+            self.fit(X_right, y_right, branch_label = branch_label_r)    
+            #split_data(X: pd.DataFrame, y: pd.Series, attribute, value) # return (X_left, y_left), (X_right, y_right)
                 
 
 
@@ -122,8 +131,23 @@ class DecisionTree:
         """
 
         # Traverse the tree you constructed to return the predicted values for the given test inputs.
+        if self.type[0]=="d":
+            X = one_hot_encoding(X, columns = X.columns)
+        # if self.type[1]=="d":
+        #     y_hat = np.empty(X.shape[0], dtype=str)
+        # else:
+        #     y_hat = np.empty(X.shape[0], dtype=float)
+        y_hat_ = []
 
         print(self.tree)
+
+        for index, row in X.iterrows():
+            branch_label = '1_'
+            # y_hat[index] = predict_helper(self.tree, self.type, branch_label, row)
+            yyy = predict_helper(self.tree, self.type, branch_label, row)
+            print(yyy)
+            y_hat_.append(yyy)
+        return y_hat_
 
     def plot(self) -> None:
         """

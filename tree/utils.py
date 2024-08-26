@@ -159,7 +159,7 @@ def information_gain(Y: pd.Series, attr: pd.Series, criterion: str, case_: str):
             # print("info gain after weight")
             # print(
             # info_gain)
-            print("shape of info_gain",info_gain.shape[0])
+            # print("shape of info_gain",info_gain.shape[0])
             attr_sorted_half=(np.array(attr_sorted[0:attr_sorted.size-1]) + np.array(attr_sorted[1:attr_sorted.size])) / 2 #(taking midpoints for split)
 
             return pd.DataFrame({"Split values":attr_sorted_half,"information_gain":info_gain})
@@ -168,13 +168,16 @@ def information_gain(Y: pd.Series, attr: pd.Series, criterion: str, case_: str):
         else:
             loss_across = np.zeros(Y.size-1)
             
-            for i in range(info_gain.shape[0]):
-                lhs_se = fn(Y_sorted[:i]) #squared error is the function used 
-                rhs_se = fn(Y_sorted[i:])
+            for i in range(loss_across.shape[0]):
+                lhs_se = fn(Y_sorted[:i+1]) #squared error is the function used 
+                rhs_se = fn(Y_sorted[i+1:])
 
                 loss_across[i] = lhs_se + rhs_se #we will pick the min loss to split 
+            
+            attr_sorted_half=(np.array(attr_sorted[0:attr_sorted.size-1]) + np.array(attr_sorted[1:attr_sorted.size])) / 2 #(taking midpoints for split)
 
-            return pd.DataFrame({"Split Values":attr_sorted,"loss":loss_across})
+
+            return pd.DataFrame({"Split_values":np.array(attr_sorted_half),"loss":loss_across})
 
 
 
@@ -225,17 +228,17 @@ def opt_split_attribute_real_input(X: pd.DataFrame, y: pd.Series, features: pd.S
             df = pd.DataFrame({"Label": y, "Attribute":X[feature]})
 
             df_returned =information_gain(df["Label"],df["Attribute"], criterion , case_) #what i recieved pd.DataFrame({"Features":features,"information_Gain":info_gain_arr}).sort_values(by="Information Gain")
-            print("this is df returend")
+            # print("this is df returend")
             df_returned = df_returned.sort_values(by="information_gain", ascending=False) 
             df_returned.reset_index(drop=True, inplace=True)
-            print(df_returned.head(5))
+            # print(df_returned.head(5))
             df_final.loc[i]= [feature,df_returned["Split values"][0],df_returned["information_gain"][0]]
             # print("this is the final df")
             # print('df_final', [feature,df_returned["Split values"][0],df_returned["information_gain"][0]])
-        print("#"*20)
-        print("this is the final df")
-        print(df_final) #######
-        print(y)
+        # print("#"*20)
+        # print("this is the final df")
+        # print(df_final) #######
+        # print(y)
         return df_final
     else:
         #Real input, real output
@@ -245,15 +248,12 @@ def opt_split_attribute_real_input(X: pd.DataFrame, y: pd.Series, features: pd.S
             feature = features[i]
             df = pd.DataFrame({"Label": y, "Attribute":X[feature]})
 
-            df_returned =information_gain(df["Label"],df["Attribute"], "squared_error",case_) #what i recieved pd.DataFrame({"Split Values":attr_sorted,"loss":loss_across})
-
-
+            df_returned =information_gain(df["Label"],df["Attribute"], "squared_error",case_) #pd.DataFrame({"Split Values":np.array(attr_sorted_half),"loss":loss_across})
             df_returned = df_returned.sort_values(by="loss", ascending=True) #the most minimum loss is what is best
             df_returned.reset_index(drop=True, inplace=True)
 
-            
 
-            df_final.loc[i]=[feature,df_returned["Split values"][i],df_returned["loss"][i]]
+            df_final.loc[i]=[feature,df_returned["Split_values"][0],df_returned["loss"][0]]
         
         return df_final
 
@@ -308,3 +308,44 @@ def split_data(X: pd.DataFrame, y: pd.Series, attribute, value, case_: str):
 
     else:
         raise ValueError("Invalid case_ value. Use 'd' for discrete and 'r' for real-valued attributes.")
+
+def predict_helper(tree,case_, branch_label, row):
+    """
+    Function to split the data according to an attribute.
+    If needed you can split this function into 2, one for discrete and one for real-valued features.
+    You can also change the parameters of this function according to your implementation.
+
+    attribute: attribute/feature to split upon
+    value: value of that attribute to split upon
+    case_: whether the attribute is discrete ('d') or real-valued ('r')
+
+    return: split data (Input and output)
+    """
+    # print(tree[branch_label])
+     
+    if type(tree[branch_label])!= dict :
+        a = tree[branch_label]
+        return a
+
+     
+    if case_[0]=="d":
+        #discrete input
+        val_att = row[tree[branch_label]["attribute"]]
+        if val_att==1:
+            branch_label=tree[branch_label]["right_label"]
+        else:
+            branch_label=tree[branch_label]["left_label"]
+        
+        predict_helper(tree,case_, branch_label, row)
+
+    else:
+        #real input 
+        val_att = row[tree[branch_label]["attribute"]]
+        split_value = tree[branch_label]["split_value"]
+
+        if val_att>split_value:
+            branch_label=tree[branch_label]["right_label"]
+        else:
+            branch_label=tree[branch_label]["left_label"]
+        
+        predict_helper(tree,case_, branch_label, row)
