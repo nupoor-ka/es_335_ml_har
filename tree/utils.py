@@ -26,14 +26,14 @@ def check_type(X: pd.DataFrame, y: pd.Series) -> str:
     output_=""
 
     if np.sqrt(y.size) < y.unique().size:
-        input_ = "r"
-    else:
-        input_ = "d"
-
-    if np.sqrt(X[0].size) < X[0].unique().size:
         output_ = "r"
     else:
         output_ = "d"
+
+    if np.sqrt(X[0].size) < X[0].unique().size:
+        input_ = "r"
+    else:
+        input_ = "d"
     
     return input_+output_
 
@@ -142,22 +142,27 @@ def information_gain(Y: pd.Series, attr: pd.Series, criterion: str, case_: str):
         
         #Real input, Discrete output (Entropy and Gini are relevant here)
         info_gain = np.array([fn(Y_sorted)]*(Y.size-1))
+        # print("info gain array before entropy weighting")
+        # print(info_gain)
 
         if case_[1]=="d":
             #potential split number is one less than number of rows 
             
 
             for i in range(info_gain.shape[0]):
-                lhs_entropy = fn(Y_sorted[:i]) #could be gini as well
-                rhs_entropy = fn(Y_sorted[i:])
+                lhs_entropy = fn(Y_sorted[:i+1]) #could be gini as well
+                rhs_entropy = fn(Y_sorted[i+1:])
 
-                weighted_entropy = (Y_sorted[:i].size/Y_sorted.size)*lhs_entropy + (Y_sorted[i:].size/Y_sorted.size)*rhs_entropy
+                weighted_entropy = (Y_sorted[:i+1].size/Y_sorted.size)*lhs_entropy + (Y_sorted[i+1:].size/Y_sorted.size)*rhs_entropy
 
                 info_gain[i] -= weighted_entropy
+            # print("info gain after weight")
+            # print(
+            # info_gain)
+            print("shape of info_gain",info_gain.shape[0])
+            attr_sorted_half=(np.array(attr_sorted[0:attr_sorted.size-1]) + np.array(attr_sorted[1:attr_sorted.size])) / 2 #(taking midpoints for split)
 
-            attr_sorted=(attr_sorted[:-1] + attr_sorted[1:]) / 2 #(taking midpoints for split)
-
-            return pd.DataFrame({"Split values":attr_sorted,"information_gain":info_gain})
+            return pd.DataFrame({"Split values":attr_sorted_half,"information_gain":info_gain})
         
         #Real input, Real output 
         else:
@@ -219,15 +224,18 @@ def opt_split_attribute_real_input(X: pd.DataFrame, y: pd.Series, features: pd.S
             feature = features[i]
             df = pd.DataFrame({"Label": y, "Attribute":X[feature]})
 
-            df_returned =information_gain(df["Label"],df["Attribute"], criterion , case_) #what i recieved pd.DataFrame({"Features":features,"Information Gain":info_gain_arr}).sort_values(by="Information Gain")
-
+            df_returned =information_gain(df["Label"],df["Attribute"], criterion , case_) #what i recieved pd.DataFrame({"Features":features,"information_Gain":info_gain_arr}).sort_values(by="Information Gain")
+            print("this is df returend")
             df_returned = df_returned.sort_values(by="information_gain", ascending=False) 
             df_returned.reset_index(drop=True, inplace=True)
-
-            df_final.iloc[i,0]=feature
-            df_final.iloc[i,1]=df_returned["Split values"]
-            df_final.iloc[i,2]=df_returned["loss"]
-        
+            print(df_returned.head(5))
+            df_final.loc[i]= [feature,df_returned["Split values"][0],df_returned["information_gain"][0]]
+            # print("this is the final df")
+            # print('df_final', [feature,df_returned["Split values"][0],df_returned["information_gain"][0]])
+        print("#"*20)
+        print("this is the final df")
+        print(df_final) #######
+        print(y)
         return df_final
     else:
         #Real input, real output
@@ -243,32 +251,60 @@ def opt_split_attribute_real_input(X: pd.DataFrame, y: pd.Series, features: pd.S
             df_returned = df_returned.sort_values(by="loss", ascending=True) #the most minimum loss is what is best
             df_returned.reset_index(drop=True, inplace=True)
 
-            df_final.iloc[i,0]=feature
-            df_final.iloc[i,1]=df_returned["Split values"]
-            df_final.iloc[i,2]=df_returned["loss"]
+            
+
+            df_final.loc[i]=[feature,df_returned["Split values"][i],df_returned["loss"][i]]
         
         return df_final
 
 
 
-def split_data(X: pd.DataFrame, y: pd.Series, attribute, value):
+def split_data(X: pd.DataFrame, y: pd.Series, attribute, value, case_: str):
     """
-    Funtion to split the data according to an attribute.
-    If needed you can split this function into 2, one for discrete and one for real valued features.
+    Function to split the data according to an attribute.
+    If needed you can split this function into 2, one for discrete and one for real-valued features.
     You can also change the parameters of this function according to your implementation.
 
     attribute: attribute/feature to split upon
     value: value of that attribute to split upon
+    case_: whether the attribute is discrete ('d') or real-valued ('r')
 
-    return: splitted data(Input and output)
+    return: split data (Input and output)
     """
+    
+    # Create a copy to avoid modifying the original DataFrame
+    X_copy = X.copy()
+    X_copy["y_label"] = y
 
-    # Split the data based on a particular value of a particular attribute. You may use masking as a tool to split the data.
+    if case_[0] == "d":
+        # Discrete input will always have the same split
+        df_right = X_copy[X_copy[attribute] == 1]  # Assuming one-hot encoding for discrete
+        df_left = X_copy[X_copy[attribute] == 0]
 
+        y_right = df_right["y_label"]
+        y_left = df_left["y_label"]
 
-    mask = X[attribute] <= value if pd.api.types.is_numeric_dtype(X[attribute]) else X[attribute] == value
+        df_right = df_right.drop("y_label", axis=1)
+        df_left = df_left.drop("y_label", axis=1)
 
-    X_left, y_left = X[mask], y[mask]
-    X_right, y_right = X[~mask], y[~mask]
+        return (df_left, y_left), (df_right, y_right)
 
-    return (X_left, y_left), (X_right, y_right)
+    elif case_[0] == "r":
+        # Ensure 'value' is a scalar
+        if not pd.api.types.is_scalar(value):
+            raise ValueError("The 'value' parameter should be a scalar for real-valued splits.")
+        
+        # Handle the real-valued input split
+        df_right = X_copy[X_copy[attribute] > value]
+        df_left = X_copy[X_copy[attribute] <= value]
+
+        y_right = df_right["y_label"]
+        y_left = df_left["y_label"]
+
+        df_right = df_right.drop("y_label", axis=1)
+        df_left = df_left.drop("y_label", axis=1)
+
+        return (df_left, y_left), (df_right, y_right)
+
+    else:
+        raise ValueError("Invalid case_ value. Use 'd' for discrete and 'r' for real-valued attributes.")
