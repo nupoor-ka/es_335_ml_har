@@ -57,7 +57,8 @@ class DecisionTree:
 
             else:
                 self.tree[branch_label] = np.mean(y)
-            return 
+            
+            return self.tree
 
         if self.current_depth==0:
             self.type = check_type(X, y)
@@ -71,10 +72,10 @@ class DecisionTree:
         if self.type[1] == 'd':
             if len(y.unique())==1:
                 self.tree[branch_label] = y.iloc[0]
-                return 
+                return self.tree
         if y.size==1:
             self.tree[branch_label] = y.iloc[0]
-            return 
+            return self.tree
         
             
 
@@ -131,8 +132,10 @@ class DecisionTree:
         """
 
         # Traverse the tree you constructed to return the predicted values for the given test inputs.
+
         if self.type[0]=="d":
             X = one_hot_encoding(X, columns = X.columns)
+
         # if self.type[1]=="d":
         #     y_hat = np.empty(X.shape[0], dtype=str)
         # else:
@@ -145,8 +148,8 @@ class DecisionTree:
             branch_label = '1_'
             # y_hat[index] = predict_helper(self.tree, self.type, branch_label, row)
             yyy = predict_helper(self.tree, self.type, branch_label, row)
-            print(yyy)
             y_hat_.append(yyy)
+
         return y_hat_
 
     def plot(self) -> None:

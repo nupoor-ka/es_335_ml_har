@@ -309,7 +309,7 @@ def split_data(X: pd.DataFrame, y: pd.Series, attribute, value, case_: str):
     else:
         raise ValueError("Invalid case_ value. Use 'd' for discrete and 'r' for real-valued attributes.")
 
-def predict_helper(tree,case_, branch_label, row):
+def predict_helper(tree_helper,case_, branch_label_helper, row):
     """
     Function to split the data according to an attribute.
     If needed you can split this function into 2, one for discrete and one for real-valued features.
@@ -321,31 +321,37 @@ def predict_helper(tree,case_, branch_label, row):
 
     return: split data (Input and output)
     """
-    # print(tree[branch_label])
-     
-    if type(tree[branch_label])!= dict :
-        a = tree[branch_label]
-        return a
+    #print(tree[branch_label_helper])
 
+    data_type =  type(tree_helper[branch_label_helper])
+
+    if  data_type != dict:
+        # print(tree_helper[branch_label_helper])
+        return_value = tree_helper[branch_label_helper].copy()
+        return return_value
+    
+
+    # print("check this out", branch_label_helper)
+    # print(type(tree_helper[branch_label_helper]))
      
     if case_[0]=="d":
         #discrete input
-        val_att = row[tree[branch_label]["attribute"]]
+        val_att = row[tree_helper[branch_label_helper]["attribute"]]
         if val_att==1:
-            branch_label=tree[branch_label]["right_label"]
+            branch_label_helper=tree_helper[branch_label_helper]["right_label"]
         else:
-            branch_label=tree[branch_label]["left_label"]
+            branch_label_helper=tree_helper[branch_label_helper]["left_label"]
         
-        predict_helper(tree,case_, branch_label, row)
+        return predict_helper(tree_helper,case_, branch_label_helper, row)
 
     else:
         #real input 
-        val_att = row[tree[branch_label]["attribute"]]
-        split_value = tree[branch_label]["split_value"]
+        val_att = row[tree_helper[branch_label_helper]["attribute"]]
+        split_value = tree_helper[branch_label_helper]["split_value"]
 
         if val_att>split_value:
-            branch_label=tree[branch_label]["right_label"]
+            branch_label_helper=tree_helper[branch_label_helper]["right_label"]
         else:
-            branch_label=tree[branch_label]["left_label"]
+            branch_label_helper=tree_helper[branch_label_helper]["left_label"]
         
-        predict_helper(tree,case_, branch_label, row)
+        return predict_helper(tree_helper,case_, branch_label_helper, row)

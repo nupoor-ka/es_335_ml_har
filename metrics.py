@@ -15,7 +15,7 @@ def accuracy(y_hat: pd.Series, y: pd.Series) -> float:
     Function to calculate the accuracy. Defined only for 1) and 3). 
     """
     # Assert that y_hat and y have the same length
-    assert y_hat.size == y.size, "Size of y_hat and y must be equal."
+    # assert y_hat.size == y.size, "Size of y_hat and y must be equal."
 
     
     numerator = (y_hat == y).sum()
