@@ -20,7 +20,7 @@ np.random.seed(42)
 
 @dataclass
 class DecisionTree:
-    criterion: Literal["information_gain", "gini_index"]  # criterion won't be used for regression
+    criterion: Literal["entropy", "gini_index","squared_loss"]  # criterion won't be used for regression
     max_depth: int  # The maximum depth the tree can grow to
 
     def __init__(self, criterion, max_depth=5):
@@ -29,6 +29,7 @@ class DecisionTree:
         self.tree = {}
         self.current_depth = 0
         self.type = ""
+        self.zero = 0
 
     def fit(self, X: pd.DataFrame, y: pd.Series, branch_label = '1_') -> None:
         """
@@ -42,10 +43,13 @@ class DecisionTree:
         #self notes 
         #the df I recieve, regardless of column, if real input, all columns real, if discrete output, all columns discrete 
         
-        print(self.current_depth) #####
+        # print(self.current_depth) #####
+        # print(X.columns)
+        
+        
 
         if self.current_depth == self.max_depth:
-            return None
+            return 
 
         if self.current_depth==0:
             self.type = check_type(X, y)
@@ -57,11 +61,11 @@ class DecisionTree:
                 
         if self.type[1] == 'd':
             if len(y.unique())==1:
-                self.tree[branch_label] = y[0]
-                return None
+                self.tree[branch_label] = y.iloc[0]
+                return 
         if y.size==1:
-            self.tree[branch_label] = y[0]
-            return None
+            self.tree[branch_label] = y.iloc[0]
+            return 
         
             
 
@@ -72,18 +76,26 @@ class DecisionTree:
 
             if self.type[1]=="r":
                 #Real input, Real output
-                df_feature_importance_and_split_point = fnn(X, y, X.columns, self.type) #pd.DataFrame["attribute","split_point","sel_or_infogain"])
-                (X_left, y_left), (X_right, y_right) =split_data(X, y, df_feature_importance_and_split_point["attribute"][0], df_feature_importance_and_split_point["split_point"][0])
+                df_feature_importance_and_split_point = fnn(X, y, X.columns, self.criterion, self.type) #pd.DataFrame["attribute","split_point","sel_or_infogain"])
+                print(df_feature_importance_and_split_point)
+                (X_left, y_left), (X_right, y_right) =split_data(X, y, df_feature_importance_and_split_point["attribute"][0], df_feature_importance_and_split_point["split_point"][0],self.type)
             else:
                 #Real input, Discrete output 
-                df_feature_importance_and_split_point = fnn(X, y, X.columns, self.type) #pd.DataFrame["attribute","split_point","sel_or_infogain"])
-                (X_left, y_left), (X_right, y_right) =split_data(X, y, df_feature_importance_and_split_point["attribute"][0], df_feature_importance_and_split_point["split_point"][0])
+                # def opt_split_attribute_real_input(X: pd.DataFrame, y: pd.Series, features: pd.Series, criterion, case_:str):
+
+                df_feature_importance_and_split_point = fnn(X, y, X.columns, self.criterion, self.type) #pd.DataFrame["attribute","split_point","sel_or_infogain"])
+                # print(df_feature_importance_and_split_point["attribute"])
+                # print(df_feature_importance_and_split_point["split_point"])
+                # print(df_feature_importance_and_split_point["sel_or_infogain"])
+                (X_left, y_left), (X_right, y_right) =split_data(X, y, df_feature_importance_and_split_point["attribute"][0], df_feature_importance_and_split_point["split_point"][0],self.type)
             
             self.current_depth+=1
-            print(self.tree) ##########
+            # print(self.tree) ##########
             self.tree[branch_label] = {'attribute':df_feature_importance_and_split_point["attribute"][0], 'split_value':df_feature_importance_and_split_point["split_point"][0], 'right_label':str(branch_label+'1_'), 'left_label':str(branch_label+'2_')}
-            self.fit(self, X_left, y_left, branch_label = str(branch_label+'2_'))
-            self.fit(self, X_right, y_right, branch_label = str(branch_label+'1_'))
+            branch_label_r = branch_label+'2_'
+            branch_label_l = branch_label+'1_'
+            self.fit(X_left, y_left, branch_label = branch_label_l)
+            self.fit(X_right, y_right, branch_label = branch_label_r)
 
         else:
             #discrete input 

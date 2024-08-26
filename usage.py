@@ -47,6 +47,7 @@ for criteria in ["information_gain", "gini_index"]:
     tree.plot()
     print("Criteria :", criteria)
     print("Accuracy: ", accuracy(y_hat, y))
+    
     for cls in y.unique():
         print("Precision: ", precision(y_hat, y, cls))
         print("Recall: ", recall(y_hat, y, cls))
