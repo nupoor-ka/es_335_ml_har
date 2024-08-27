@@ -31,7 +31,7 @@ ACTIVITIES = {
                                         # Combining Traing Data
 #=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-==-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 
-# Load all the accelerometer data
+# Loading the body_acc train data
 body_acc_x = pd.read_csv(os.path.join(train_path,"Inertial Signals","body_acc_x_train.txt"),delim_whitespace=True,header=None)
 body_acc_y = pd.read_csv(os.path.join(train_path,"Inertial Signals","body_acc_y_train.txt"),delim_whitespace=True,header=None)
 body_acc_z = pd.read_csv(os.path.join(train_path,"Inertial Signals","body_acc_z_train.txt"),delim_whitespace=True,header=None)
@@ -83,6 +83,7 @@ for subject in np.unique(subject_train.values):
 
 print("Done Combining the body acc training data")
 
+# Loading the body_gyro train data
 body_gyro_x = pd.read_csv(os.path.join(train_path,"Inertial Signals","body_gyro_x_train.txt"),delim_whitespace=True,header=None)
 body_gyro_y = pd.read_csv(os.path.join(train_path,"Inertial Signals","body_gyro_y_train.txt"),delim_whitespace=True,header=None)
 body_gyro_z = pd.read_csv(os.path.join(train_path,"Inertial Signals","body_gyro_z_train.txt"),delim_whitespace=True,header=None)
@@ -128,7 +129,7 @@ print("Done Combining the gyro acc training data")
                                         # Combining Test Data               
 #=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-==-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 
-# Load all the accelerometer data
+# Loading the body_acc test data
 body_acc_x = pd.read_csv(os.path.join(test_path,"Inertial Signals","body_acc_x_test.txt"),delim_whitespace=True,header=None)
 body_acc_y = pd.read_csv(os.path.join(test_path,"Inertial Signals","body_acc_y_test.txt"),delim_whitespace=True,header=None)
 body_acc_z = pd.read_csv(os.path.join(test_path,"Inertial Signals","body_acc_z_test.txt"),delim_whitespace=True,header=None)
@@ -176,6 +177,7 @@ for subject in np.unique(subject_test.values):
 
 print("Done Combining the body testing data")
 
+# Loading the body_gyro test data
 body_gyro_x = pd.read_csv(os.path.join(test_path,"Inertial Signals","body_gyro_x_test.txt"),delim_whitespace=True,header=None)
 body_gyro_y = pd.read_csv(os.path.join(test_path,"Inertial Signals","body_gyro_y_test.txt"),delim_whitespace=True,header=None)
 body_gyro_z = pd.read_csv(os.path.join(test_path,"Inertial Signals","body_gyro_z_test.txt"),delim_whitespace=True,header=None)

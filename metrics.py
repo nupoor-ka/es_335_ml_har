@@ -15,7 +15,7 @@ def accuracy(y_hat: pd.Series, y: pd.Series) -> float:
     Function to calculate the accuracy. Defined only for 1) and 3). 
     """
     # Assert that y_hat and y have the same length
-    # assert y_hat.size == y.size, "Size of y_hat and y must be equal."
+    assert y_hat.size == y.size, "Size of y_hat and y must be equal."
 
     
     numerator = (y_hat == y).sum()
@@ -69,8 +69,8 @@ def rmse(y_hat: pd.Series, y: pd.Series) -> float:
     Function to calculate the root-mean-squared-error(rmse). Defined only for 2) and 4).
     """
     assert y_hat.size == y.size, "Size of y_hat and y must be equal."
-    assert y.size==0, "Ground Truth array is 0"
-    assert y_hat.size==0, "Predicition array is 0"
+    assert y.size!=0, "Ground Truth array is 0"
+    assert y_hat.size!=0, "Predicition array is 0"
 
 
     y_hat = np.array(y_hat)
