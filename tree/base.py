@@ -77,7 +77,8 @@ class DecisionTree:
             self.tree[branch_label] = y.iloc[0]
             return self.tree
         
-            
+        # self.current_depth+=1 ########
+        print(branch_label, self.current_depth)    ########
 
         if self.type[0] == "r":
             #real input 
@@ -99,13 +100,11 @@ class DecisionTree:
                 # print(df_feature_importance_and_split_point["sel_or_infogain"])
                 (X_left, y_left), (X_right, y_right) =split_data(X, y, df_feature_importance_and_split_point["attribute"][0], df_feature_importance_and_split_point["split_point"][0],self.type)
             
-            self.current_depth+=1
+            # self.current_depth+=1
             # print(self.tree) ##########
             self.tree[branch_label] = {'attribute':df_feature_importance_and_split_point["attribute"][0], 'split_value':df_feature_importance_and_split_point["split_point"][0], 'right_label':str(branch_label+'1_'), 'left_label':str(branch_label+'2_')}
-            branch_label_r = branch_label+'2_'
-            branch_label_l = branch_label+'1_'
-            self.fit(X_left, y_left, branch_label = branch_label_l)
-            self.fit(X_right, y_right, branch_label = branch_label_r)
+            
+        
 
         else:
             #discrete input 
@@ -114,14 +113,16 @@ class DecisionTree:
             
             features_importance = fnn(X,y,self.criterion,X.columns,self.type)
             (X_left, y_left), (X_right, y_right) =split_data(X, y, features_importance, None,self.type)
-            self.current_depth+=1
-            branch_label_r = branch_label+'2_'
-            branch_label_l = branch_label+'1_'
+            # self.current_depth+=1
             self.tree[branch_label] = {'attribute':features_importance, 'right_label':branch_label_r, 'left_label':branch_label_l}
-            self.fit(X_left, y_left, branch_label = branch_label_l)
-            self.fit(X_right, y_right, branch_label = branch_label_r)    
-            #split_data(X: pd.DataFrame, y: pd.Series, attribute, value) # return (X_left, y_left), (X_right, y_right)
-
+        
+        self.current_depth+=1               ####
+        branch_label_r = branch_label+'2_'####
+        branch_label_l = branch_label+'1_'####
+        print(self.current_depth, branch_label_r, branch_label_l)####
+        self.fit(X_left, y_left, branch_label = branch_label_l)#####
+        self.fit(X_right, y_right, branch_label = branch_label_r)   ##### 
+            
 
     def predict(self, X: pd.DataFrame) -> pd.Series:
         """
