@@ -25,9 +25,10 @@ combined_dir = os.path.join("Combined")
 #=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-==-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
                                                 # Train Dataset
 #=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-==-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-
+#Lists for extracting train data of body_gyro.
 X_train_gyro=[]
 y_train_gyro=[]
+#Making new directory for train data of Body_gyro data.
 dataset_dir = os.path.join(combined_dir,"Gyro_Train")
 
 for folder in folders:
@@ -39,7 +40,7 @@ for folder in folders:
         df = df[offset:offset+time*50]
         X_train_gyro.append(df.values)
         y_train_gyro.append(classes[folder])
-
+#Converting lists to arrays.
 X_train_gyro = np.array(X_train_gyro)
 y_train_gyro = np.array(y_train_gyro)
 
@@ -47,9 +48,10 @@ y_train_gyro = np.array(y_train_gyro)
 #=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-==-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
                                                 # Test Dataset
 #=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-==-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-
+#Lists for extracting test data of body_gyro.
 X_test_gyro=[]
 y_test_gyro=[]
+#Making new directory for train data of Body_gyro data.
 dataset_dir = os.path.join(combined_dir,"Gyro_Test")
 
 for folder in folders:
@@ -60,7 +62,7 @@ for folder in folders:
         df = df[offset:offset+time*50]
         X_test_gyro.append(df.values)
         y_test_gyro.append(classes[folder])
-
+#Converting lists to arrays.
 X_test_gyro= np.array(X_test_gyro)
 y_test_gyro = np.array(y_test_gyro)
 

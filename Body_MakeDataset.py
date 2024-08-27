@@ -25,10 +25,11 @@ combined_dir = os.path.join("Combined")
 #=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-==-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
                                                 # Train Dataset
 #=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-==-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-
+#Lists for extracting train data of body_acc.
 X_train_body=[]
 y_train_body=[]
-dataset_dir = os.path.join(combined_dir,"Body_Train")
+#Making new directory for train data of Body_acc data.
+dataset_dir = os.path.join(combined_dir,"Body_Train") 
 
 for folder in folders:
     files = os.listdir(os.path.join(dataset_dir,folder))
@@ -40,6 +41,7 @@ for folder in folders:
         X_train_body.append(df.values)
         y_train_body.append(classes[folder])
 
+#Converting lists to arrays.
 X_train_body = np.array(X_train_body)
 y_train_body = np.array(y_train_body)
 
@@ -47,9 +49,10 @@ y_train_body = np.array(y_train_body)
 #=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-==-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
                                                 # Test Dataset
 #=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-==-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-
+#Lists for extracting test data of body_acc.
 X_test_body=[]
 y_test_body=[]
+#Making new directory for train data of Body_acc data.
 dataset_dir = os.path.join(combined_dir,"Body_Test")
 
 for folder in folders:
@@ -60,7 +63,7 @@ for folder in folders:
         df = df[offset:offset+time*50]
         X_test_body.append(df.values)
         y_test_body.append(classes[folder])
-
+#Converting lists to arrays.
 X_test_body= np.array(X_test_body)
 y_test_body = np.array(y_test_body)
 
