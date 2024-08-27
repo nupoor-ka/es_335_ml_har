@@ -30,6 +30,7 @@ def check_type(X: pd.DataFrame, y: pd.Series) -> str:
     else:
         output_ = "d"
 
+    #assuming that the if discrete/real, every column will be discrete/real
     if np.sqrt(X.iloc[:,0].size) < X.iloc[:,0].unique().size:
         input_ = "r"
     else:
@@ -96,7 +97,7 @@ def information_gain(Y: pd.Series, attr: pd.Series, criterion: str, case_: str):
     return: float for discrete input, dataframe for real input
     """
     #FIX FOR REAL INPUT OR attr.dtype = float
-
+    Y_t = Y
     
 
     if case_[0]=="d":
@@ -121,7 +122,7 @@ def information_gain(Y: pd.Series, attr: pd.Series, criterion: str, case_: str):
             reduction+= weight*fn(df_filtered["value"])
         
         info_gain -= reduction
-
+        Y = Y_t
         return info_gain
     else:
         #real input
@@ -161,7 +162,7 @@ def information_gain(Y: pd.Series, attr: pd.Series, criterion: str, case_: str):
             # info_gain)
             # print("shape of info_gain",info_gain.shape[0])
             attr_sorted_half=(np.array(attr_sorted[0:attr_sorted.size-1]) + np.array(attr_sorted[1:attr_sorted.size])) / 2 #(taking midpoints for split)
-
+            Y = Y_t
             return pd.DataFrame({"Split values":attr_sorted_half,"information_gain":info_gain})
         
         #Real input, Real output 
@@ -176,9 +177,9 @@ def information_gain(Y: pd.Series, attr: pd.Series, criterion: str, case_: str):
             
             attr_sorted_half=(np.array(attr_sorted[0:attr_sorted.size-1]) + np.array(attr_sorted[1:attr_sorted.size])) / 2 #(taking midpoints for split)
 
-
+            Y = Y_t
             return pd.DataFrame({"Split_values":np.array(attr_sorted_half),"loss":loss_across})
-
+    
 
 
 def opt_split_attribute_discrete_input(X: pd.DataFrame, y: pd.Series, criterion, features: pd.Series, case_:str):
@@ -295,8 +296,8 @@ def split_data(X: pd.DataFrame, y: pd.Series, attribute, value, case_: str):
             raise ValueError("The 'value' parameter should be a scalar for real-valued splits.")
         
         # Handle the real-valued input split
-        df_right = X_copy[X_copy[attribute] > value]
-        df_left = X_copy[X_copy[attribute] <= value]
+        df_right = X_copy[X_copy[attribute] >= value]
+        df_left = X_copy[X_copy[attribute] < value]
 
         y_right = df_right["y_label"]
         y_left = df_left["y_label"]
@@ -349,7 +350,7 @@ def predict_helper(tree_helper,case_, branch_label_helper, row):
         val_att = row[tree_helper[branch_label_helper]["attribute"]]
         split_value = tree_helper[branch_label_helper]["split_value"]
 
-        if val_att>split_value:
+        if val_att<split_value:
             branch_label_helper=tree_helper[branch_label_helper]["right_label"]
         else:
             branch_label_helper=tree_helper[branch_label_helper]["left_label"]

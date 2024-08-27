@@ -27,7 +27,7 @@ def accuracy(y_hat: pd.Series, y: pd.Series) -> float:
 
     
     accuracy = numerator / denominator
-    return accuracy 
+    return float(accuracy) 
 
 
 def precision(y_hat: pd.Series, y: pd.Series, cls: Union[int, str]) -> float:
@@ -72,11 +72,13 @@ def rmse(y_hat: pd.Series, y: pd.Series) -> float:
     assert y.size!=0, "Ground Truth array is 0"
     assert y_hat.size!=0, "Predicition array is 0"
 
+    y_c = y.copy()
+    y_hat_c = y_hat.copy()
 
-    y_hat = np.array(y_hat)
-    y = np.array(y)
-    numerator = np.sum((y_hat-y)**2)
-    denominator = y.size
+    y_hat_c = np.array(y_hat_c)
+    y_c = np.array(y_c)
+    numerator = np.sum((y_hat_c-y_c)**2)
+    denominator = y_c.size
 
     return np.sqrt(numerator/denominator) 
 
@@ -92,11 +94,13 @@ def mae(y_hat: pd.Series, y: pd.Series) -> float:
     assert y.size, "Ground Truth array is 0"
     assert y_hat.size, "Predicition array is 0"
 
+    y_c = y.copy()
+    y_hat_c = y_hat.copy()
 
-    y_hat = np.array(y_hat)
-    y = np.array(y)
-    numerator = np.sum((np.abs(y_hat-y)))
+    y_hat_c = np.array(y_hat_c)
+    y_c = np.array(y_c)
+    numerator = np.sum((np.abs(y_hat_c-y_c)))
 
-    denominator = y.size
+    denominator = y_c.size
 
     return numerator/denominator
