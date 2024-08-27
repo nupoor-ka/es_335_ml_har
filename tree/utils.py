@@ -30,7 +30,7 @@ def check_type(X: pd.DataFrame, y: pd.Series) -> str:
     else:
         output_ = "d"
 
-    if np.sqrt(X[0].size) < X[0].unique().size:
+    if np.sqrt(X.iloc[:,0].size) < X.iloc[:,0].unique().size:
         input_ = "r"
     else:
         input_ = "d"

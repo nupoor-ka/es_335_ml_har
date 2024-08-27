@@ -121,9 +121,6 @@ class DecisionTree:
             self.fit(X_left, y_left, branch_label = branch_label_l)
             self.fit(X_right, y_right, branch_label = branch_label_r)    
             #split_data(X: pd.DataFrame, y: pd.Series, attribute, value) # return (X_left, y_left), (X_right, y_right)
-                
-
-
 
 
     def predict(self, X: pd.DataFrame) -> pd.Series:
@@ -136,19 +133,17 @@ class DecisionTree:
         if self.type[0]=="d":
             X = one_hot_encoding(X, columns = X.columns)
 
-        # if self.type[1]=="d":
-        #     y_hat = np.empty(X.shape[0], dtype=str)
-        # else:
-        #     y_hat = np.empty(X.shape[0], dtype=float)
-        y_hat_ = []
+        if self.type[1]=="d":
+            y_hat_ = pd.Series(dtype="float64")
+        else:
+            y_hat_ = pd.Series(dtype="float64")
 
-        print(self.tree)
+        # print(self.tree)
 
         for index, row in X.iterrows():
             branch_label = '1_'
-            # y_hat[index] = predict_helper(self.tree, self.type, branch_label, row)
             yyy = predict_helper(self.tree, self.type, branch_label, row)
-            y_hat_.append(yyy)
+            y_hat_.loc[index] = yyy
 
         return y_hat_
 
