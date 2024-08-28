@@ -1,3 +1,13 @@
+# ES335 -  Machine Learning Fall 2024- Sabarmati Sigmoids
+This repository contains the code for the assignment 1 of the course ES335: Introduction to Machine Learning Fall 2024 at IIT Gandhinagar taught by Prof. Nipun Batra. There are 5 parts of this assignment which are described below. All the tasks are solved in python notebooks.
+Task1: [Task_1](Asst1_exploratory_data_analysis_all_questions.ipynb) 
+Task2: [Task_2](Asst1_sklearn_decision_tree_all_questions.ipynb)
+Task3: [Task_3](Asst1_LLM_predictions_all_questions.ipynb)
+Task4: [Task_4](Asst1_collected_data_predictions.ipynb)
+Task5: [Task_5](Asst1_decision_tree_scratch_all_questions.ipynb)
+
+The python files used and made for the decisiion tree from scratch are in the [tree](tree) folder. and [usage.py](usage.py), [metrics.py](metrics.py) and [experiments.py](experiments.py)
+
 # Assignment 1
 
 ## Total 20 marks (Will be scaled down to 10 marks)
