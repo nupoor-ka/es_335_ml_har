@@ -112,8 +112,8 @@ print("#"*25)
 print("Comparative analysis with depth variation \n")
 
 
-# Initialize lists to store metrics at different depths
-depths = range(1, 6)  # For example, testing depths from 1 to 20
+#Initialize lists to store metrics at different depths
+depths = range(1, 6)  
 rmse_custom_tree = []
 mae_custom_tree = []
 rmse_sklearn_tree = []
@@ -124,16 +124,16 @@ y_train_copy = y_train.copy()
 X_test_copy = X_test.copy()
 y_test_copy = y_test.copy()
 
-# Loop over depths and calculate metrics for both your custom tree and sklearn tree
+#Loop over depths and calculate metrics for both our custom tree and sklearn tree
 for depth in depths:
-       # Custom Decision Tree
+       #Custom 
        tree = DecisionTree(criterion="squared_loss", max_depth=depth, case_tree="rr")
        tree.fit(X_train_copy, y_train_copy)
        y_hat_custom = tree.predict(X_test_copy)
        rmse_custom_tree.append(rmse(y_hat_custom, y_test_copy))
        mae_custom_tree.append(mae(y_hat_custom, y_test_copy))
 
-       # Sklearn Decision Tree
+       #Sklearn
        sklearn_tree = DecisionTreeRegressor(random_state=42, max_depth=depth)
        sklearn_tree.fit(X_train, y_train)
        y_hat_sklearn = sklearn_tree.predict(X_test)
@@ -142,7 +142,7 @@ for depth in depths:
        print(y_train_copy)
 
 
-# Convert the results to a DataFrame for easier plotting
+
 results_df = pd.DataFrame({
     'Depth': list(depths) * 2,
     'RMSE': rmse_custom_tree + rmse_sklearn_tree,
@@ -150,10 +150,10 @@ results_df = pd.DataFrame({
     'Model': ['Custom Tree'] * len(depths) + ['Sklearn Tree'] * len(depths)
 })
 
-# Plot using seaborn joint plot
+
 plt.figure(figsize=(10, 6))
 
-# Plot RMSE and MAE vs Depth for both models
+#Plot RMSE and MAE vs Depth for both models
 sns.lineplot(data=results_df, x='Depth', y='RMSE', hue='Model', marker='o')
 plt.title('RMSE vs Depth for Custom Tree vs Sklearn Tree')
 plt.show()

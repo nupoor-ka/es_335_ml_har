@@ -12,6 +12,8 @@ from typing import Literal
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
+from matplotlib.patches import FancyBboxPatch
+
 from tree.utils import *
 
 np.random.seed(42)
@@ -168,16 +170,75 @@ class DecisionTree:
 
         return y_hat_
 
-    def plot(self) -> None:
-        """
-        Function to plot the tree
+    # def plot(self) -> None:
+    #     """
+    #     Function to plot the tree
 
-        Output Example:
-        ?(X1 > 4)
-            Y: ?(X2 > 7)
-                Y: Class A
-                N: Class B
-            N: Class C
-        Where Y => Yes and N => No
-        """
-        pass
+    #     Output Example:
+    #     ?(X1 > 4)
+    #         Y: ?(X2 > 7)
+    #             Y: Class A
+    #             N: Class B
+    #         N: Class C
+    #     Where Y => Yes and N => No
+    #     """
+    #     pass
+    # ... eximport matplotlib.pyplot as plt
+
+def plot(self, node_label='1_', depth=0, x=0.5, y=1.0, dx=0.25, dy=0.1, ax=None):
+    if ax is None:
+        fig, ax = plt.subplots(figsize=(12, 8))
+        ax.set_axis_off()
+
+    # Colors for nodes based on depth
+    if depth == 0:
+        node_color = 'lightcoral'
+    elif depth % 2 == 0:
+        node_color = 'lightblue'
+    else:
+        node_color = 'lightgreen'
+
+    if isinstance(self.tree[node_label], dict):
+        # Get the current node information
+        attribute = self.tree[node_label]['attribute']
+        split_value = self.tree[node_label].get('split_value', None)
+        right_label = self.tree[node_label]['right_label']
+        left_label = self.tree[node_label]['left_label']
+
+        # Plot the node text with depth
+        if split_value==None:
+            ax.text(x, y, f'Depth: {depth}\n{attribute}\n', 
+                    ha='center', va='center', 
+                    bbox=dict(boxstyle='round,pad=0.3', facecolor=node_color, edgecolor='black'))
+        else:
+            ax.text(x, y, f'Depth: {depth}\n{attribute}\n<= {split_value:.3f}', 
+                    ha='center', va='center', 
+                    bbox=dict(boxstyle='round,pad=0.3', facecolor=node_color, edgecolor='black'))
+        
+
+        # Plot edges and recursively plot left and right subtrees
+        if left_label in self.tree:
+            # Line to left child
+            ax.plot([x, x - dx], [y, y - dy], 'k-', lw=1)
+            self.plot(node_label=left_label, depth=depth + 1, x=x - dx, y=y - dy, dx=dx * 0.5, dy=dy, ax=ax)
+
+        if right_label in self.tree:
+            # Line to right child
+            ax.plot([x, x + dx], [y, y - dy], 'k-', lw=1)
+            self.plot(node_label=right_label, depth=depth + 1, x=x + dx, y=y - dy, dx=dx * 0.5, dy=dy, ax=ax)
+
+    else:
+        # Leaf node, approximate to 3 decimal places if float
+        leaf_value = self.tree[node_label]
+        if isinstance(leaf_value, float):
+            leaf_value = round(leaf_value, 3)
+        
+        ax.text(x, y, f'Depth: {depth}\nClass: {leaf_value}', 
+                ha='center', va='center', 
+                bbox=dict(boxstyle='round,pad=0.3', facecolor='lightyellow', edgecolor='black'))
+
+    if depth == 0:
+        plt.show()
+
+DecisionTree.plot = plot
+
