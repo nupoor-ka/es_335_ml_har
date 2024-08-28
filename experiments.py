@@ -48,16 +48,15 @@ def rd(N,P):
                 y_hat = tree.predict(X)
                 tp2=time.time()
                 times_predict.append(tp2-tp1)
-                tree.plot()
                 print("Criteria :", criteria1)
                 print("Accuracy: ", accuracy(y_hat, y))
                 for cls in y.unique():
                     print("Precision: ", precision(y_hat, y, cls))
                     print("Recall: ", recall(y_hat, y, cls))
-    times_fit_e=times_fit[:9]
-    times_fit_g=times_fit[9:]
-    times_predict_e=times_predict[:9]
-    times_predict_g=times_predict[9:]
+    times_fit_e=times_fit[:16]
+    times_fit_g=times_fit[16:]
+    times_predict_e=times_predict[:16]
+    times_predict_g=times_predict[16:]
     print('For Entropy')
     plot_runtime(times_fit_e, times_predict_e, N, P)
     print('For Gini')
@@ -86,7 +85,6 @@ def dr(N,P):
                 y_hat = tree.predict(X)
                 tp2=time.time()
                 times_predict.append(tp2-tp1)
-                tree.plot()
                 print("Criteria :", criteria)
                 print("RMSE: ", rmse(y_hat, y))
                 print("MAE: ", mae(y_hat, y))
