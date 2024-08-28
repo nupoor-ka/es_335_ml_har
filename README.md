@@ -8,7 +8,7 @@ This repository contains the code for the assignment 1 of the course ES335: Intr
 4. Task4: [Task_4](Asst1_collected_data_predictions.ipynb)
 5. Task5: [Task_5](Asst1_decision_tree_scratch_all_questions.ipynb)
 
-The python files used and made for the decision tree from scratch are in the [tree](tree) folder. and [usage.py](usage.py), [metrics.py](metrics.py) and [experiments.py](experiments.py)
+
 
 # Assignment 1
 
