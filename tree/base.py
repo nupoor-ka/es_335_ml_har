@@ -12,6 +12,8 @@ from typing import Literal
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
+from matplotlib.patches import FancyBboxPatch
+
 from tree.utils import *
 
 np.random.seed(42)
@@ -159,7 +161,7 @@ class DecisionTree:
         y_hat_ = pd.Series(dtype="float64")
         
 
-        # print(self.tree)
+        print(self.tree)
 
         for index, row in X.iterrows():
             branch_label = '1_'
