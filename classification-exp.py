@@ -27,26 +27,25 @@ plt.scatter(X[:, 0], X[:, 1], c=y)
 
 # Q2 a)
 
-# converting to X as 
+#converting to X as 
 X_df = pd.DataFrame(X, columns=['Feature1', 'Feature2'])
 y_series = pd.Series(y, name='Target')
 
-# Normalize the data
+#Normalize the data
 scaler = StandardScaler()
 X_df_normalized = pd.DataFrame(scaler.fit_transform(X_df), columns=X_df.columns)
 
-# Perform the train-test split
+#Perform the train-test split
 X_train, X_test, y_train, y_test = train_test_split(X_df_normalized, y_series, test_size=0.3, random_state=42)
 
-# Plot the training and testing data
 plt.figure(figsize=(10, 5))
 
-# Plot training data
+#Plot training
 plt.subplot(1, 2, 1)
 plt.scatter(X_train['Feature1'], X_train['Feature2'], c=y_train, cmap='viridis')
 plt.title('Training Data')
 
-# Plot testing data
+#Plot testing 
 plt.subplot(1, 2, 2)
 plt.scatter(X_test['Feature1'], X_test['Feature2'], c=y_test, cmap='viridis')
 plt.title('Testing Data')
@@ -89,7 +88,7 @@ for criteria in ["entropy","gini_index"]:
 
 depths = list(range(1, 21))
 
-# Initialize KFold for cross-validation
+#KFold for cross-validation
 kf_outer = KFold(n_splits=5, shuffle=True, random_state=42)
 
 def evaluate_depth(depth, X_train, y_train, X_val, y_val):
